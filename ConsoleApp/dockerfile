@@ -1,0 +1,19 @@
+﻿FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /app
+
+# Copy solution and restore dependencies
+COPY *.sln ./
+COPY ConsoleApp/ConsoleApp.csproj ./ConsoleApp/
+COPY Core/Core.csproj ./Core/
+RUN dotnet restore ConsoleApp/ConsoleApp.csproj
+
+# Copy everything and build
+COPY . ./
+WORKDIR /app/ConsoleApp
+RUN dotnet publish -c Release -o /out
+
+# Use ASP.NET runtime instead of base runtime
+FROM mcr.microsoft.com/dotnet/aspnet:8.0
+WORKDIR /app
+COPY --from=build /out ./
+ENTRYPOINT ["dotnet", "ConsoleApp.dll"]

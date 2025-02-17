@@ -1,0 +1,5 @@
+services:
+  api:
+    environment:
+      - MONGO_USER=patient_temp_user
+      - MONGO_PASS=TY8XeXU6G8KYthpZ

@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo
+    container_name: mongodb
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: patient_temp_user
+      MONGO_INITDB_ROOT_PASSWORD: TY8XeXU6G8KYthpZ
+    volumes:
+      - mongodb_data:/data/db
+
+  api:
+    build:
+      context: .
+      dockerfile: API/Dockerfile
+    container_name: api
+    depends_on:
+      - mongodb
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Production"
+      ASPNETCORE_URLS: "http://+:5000"
+      PATIENT_API_BASE_URL: "http://api:5000"
+      MongoDbSettings__ConnectionString: "mongodb+srv://patient_temp_user:TY8XeXU6G8KYthpZ@cluster0.fielw.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+    ports:
+      - "5000:5000"
+
+  consoleapp:
+    build:
+      context: .
+      dockerfile: ConsoleApp/Dockerfile
+    container_name: consoleapp
+    depends_on:
+      - api
+    environment:
+      PATIENT_API_BASE_URL: "http://api:5000"
+
+volumes:
+  mongodb_data:
