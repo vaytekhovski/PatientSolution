@@ -64,9 +64,9 @@ public class PatientService : IPatientService
             throw new ValidationException("You cannot update BirthDate or Gender by now");
 
         var newValue = dto.ToEntity(oldValue);
-        await Repository.UpdateAsync(newValue);
 
-        await Task.WhenAll(changes.ToChangeLogs(newValue.Id).Select(ChangesLogger.CreateAsync));
+        await Task.WhenAll(Repository.UpdateAsync(newValue),
+            Task.WhenAll(changes.ToChangeLogs(newValue.Id).Select(ChangesLogger.CreateAsync)));
 
         return newValue.ToDto();
     }
