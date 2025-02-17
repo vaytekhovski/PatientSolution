@@ -28,3 +28,4 @@
 
 5. **Postman**.
    - The collection file for Postman is available at: [https://www.postman.com/sngjob/patient-solution/overview](https://www.postman.com/sngjob/patient-solution/overview).
+   - Don't forget to select environment!
