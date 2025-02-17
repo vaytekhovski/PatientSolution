@@ -1,10 +1,8 @@
 ﻿using Core.DTOs;
-using Core.Common.Extensions;
 using Core.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
-using Application.Services;
 using Swashbuckle.AspNetCore.Annotations;
-using Core.Entities;
+
 
 namespace API.Controllers;
 
@@ -26,7 +24,7 @@ public class PatientController : ControllerBase
         Summary = "Get a patient by ID",
         Description = "Returns the patient by patient identifier"
     )]
-    [SwaggerResponse(StatusCodes.Status200OK, "Successfully found a patient", typeof(Patient))]
+    [SwaggerResponse(StatusCodes.Status200OK, "Successfully found a patient", typeof(Response))]
     [SwaggerResponse(StatusCodes.Status404NotFound, "Patient not found")]
     public async Task<IActionResult> FindAsync(Guid id)
     {
@@ -39,7 +37,7 @@ public class PatientController : ControllerBase
         Summary = "Get all patients",
         Description = "Returns a list of all patients"
     )]
-    [SwaggerResponse(StatusCodes.Status200OK, "Successfully retrieved patients", typeof(List<Patient>))]
+    [SwaggerResponse(StatusCodes.Status200OK, "Successfully retrieved patients", typeof(List<Response>))]
     public async Task<IActionResult> Find()
     {
         var patients = await PatientService.FindAsync();
@@ -51,7 +49,7 @@ public class PatientController : ControllerBase
         Summary = "Search patients by birthdate",
         Description = "Finds patients by birthdate and optional birth time"
     )]
-    [SwaggerResponse(StatusCodes.Status200OK, "Successfully retrieved matching patients", typeof(List<Patient>))]
+    [SwaggerResponse(StatusCodes.Status200OK, "Successfully retrieved matching patients", typeof(List<Response>))]
     [SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid search parameters")]
     public async Task<ActionResult<List<Response>>> SearchByBirthDate(
         [FromQuery] DateOnly date,
@@ -68,7 +66,7 @@ public class PatientController : ControllerBase
         Summary = "Create a new patient",
         Description = "Creates a new patient record"
     )]
-    [SwaggerResponse(StatusCodes.Status201Created, "Successfully created a patient", typeof(Patient))]
+    [SwaggerResponse(StatusCodes.Status201Created, "Successfully created a patient", typeof(Response))]
     [SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid patient data")]
     public async Task<IActionResult> Create([FromBody] Create dto)
     {
@@ -81,7 +79,7 @@ public class PatientController : ControllerBase
         Summary = "Update a patient",
         Description = "Updates an existing patient record"
     )]
-    [SwaggerResponse(StatusCodes.Status200OK, "Successfully updated the patient", typeof(Patient))]
+    [SwaggerResponse(StatusCodes.Status200OK, "Successfully updated the patient", typeof(Response))]
     [SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid update request")]
     [SwaggerResponse(StatusCodes.Status404NotFound, "Patient not found")]
     public async Task<IActionResult> Update(Guid id, [FromBody] Update dto)
