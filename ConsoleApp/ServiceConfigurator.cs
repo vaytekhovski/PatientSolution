@@ -15,7 +15,7 @@ public static class ServiceConfigurator
         services.AddSingleton<IPatientFactory, PatientFactory>();
         services.AddSingleton<IPatientSender, PatientSender>();
         services.AddSingleton<IApiChecker, ApiChecker>(sp => new ApiChecker(sp.GetRequiredService<HttpClient>(), apiUrl));
-        services.AddSingleton<SendPatientCommand>(sp => new SendPatientCommand(sp.GetRequiredService<HttpClient>(), apiUrl));
+        services.AddSingleton(sp => new SendPatientCommand(sp.GetRequiredService<HttpClient>(), apiUrl));
 
         return services.BuildServiceProvider();
     }
