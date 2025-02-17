@@ -1,25 +1,21 @@
-﻿namespace ConsoleApp;
-public class Program
+﻿using ConsoleApp;
+using ConsoleApp.Factory;
+using ConsoleApp.Services;
+using Microsoft.Extensions.DependencyInjection;
+
+var serviceProvider = ServiceConfigurator.ConfigureServices();
+
+var apiChecker = serviceProvider.GetRequiredService<IApiChecker>();
+var patientFactory = serviceProvider.GetRequiredService<IPatientFactory>();
+var patientSender = serviceProvider.GetRequiredService<IPatientSender>();
+
+if (!await apiChecker.IsApiAvailableAsync())
 {
-    public static async Task Main()
-    {
-        string apiUrl = Environment.GetEnvironmentVariable("PATIENT_API_BASE_URL") ?? "http://localhost:5000";
-        int patientCount = 100;
-
-        Console.WriteLine($"Checking API availability at {apiUrl}...");
-        if (!await ApiChecker.IsApiAvailable(apiUrl))
-        {
-            Console.WriteLine("API is not available. Exiting.");
-            return;
-        }
-
-        Console.WriteLine("API is available! Generating patient data...");
-        var patients = PatientGenerator.GeneratePatients(patientCount);
-
-        Console.WriteLine($"Sending {patients.Count} patients to the API...");
-        await PatientSender.SendPatients(apiUrl, patients);
-
-        Console.WriteLine("Verifying data after submission...");
-        await PatientVerifier.CheckPatientsInApi(apiUrl);
-    }
+    Console.WriteLine("API is not available. Exiting...");
+    return;
 }
+
+var patients = patientFactory.Create(100);
+await patientSender.SendPatientsAsync(patients);
+
+Console.WriteLine("Process completed.");
