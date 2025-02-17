@@ -1,33 +1,44 @@
 ﻿using Infrastructure.Configuration;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using Microsoft.OpenApi.Models;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization;
+using MongoDB.Bson.Serialization.Serializers;
+using MongoDB.Driver;
 
 namespace Infrastructure.Extensions;
 
 public static class ServiceExtension
 {
-    public static IServiceCollection ConfigureServices(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddSwagger(this IServiceCollection services)
     {
-        services.AddControllers();
-        services.AddEndpointsApiExplorer();
-        services.ConfigureSwagger();
-
-        services.AddMongoDb(configuration);
-        services.AddRepositories();
-        services.AddApplicationServices();
-
-        var apiBaseUrl = configuration["PATIENT_API_BASE_URL"] ?? "http://localhost:5000";
-        services.AddSingleton(new ApiSettings { BaseUrl = apiBaseUrl });
-
-        var corsSettings = configuration.GetSection("CorsPolicy");
-        services.AddCors(options =>
+        services.AddSwaggerGen(c =>
         {
-            options.AddPolicy("AllowAll", policy =>
-            {
-                policy.WithOrigins(corsSettings.GetSection("AllowedOrigins").Get<string[]>())
-                      .WithMethods(corsSettings.GetSection("AllowedMethods").Get<string[]>())
-                      .WithHeaders(corsSettings.GetSection("AllowedHeaders").Get<string[]>());
-            });
+            c.SwaggerDoc("v1", new OpenApiInfo { Title = "Patient API", Version = "v1" });
+            c.EnableAnnotations();
+        });
+
+        return services;
+    }
+
+    public static IServiceCollection AddMongoDb(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.Configure<MongoDbSettings>(configuration.GetSection("MongoDbSettings"));
+
+        BsonSerializer.RegisterSerializer(new GuidSerializer(BsonType.String));
+        services.AddSingleton<IMongoClient>(sp =>
+        {
+            var settings = sp.GetRequiredService<IOptions<MongoDbSettings>>().Value;
+            return new MongoClient(settings.ConnectionString);
+        });
+
+        services.AddScoped(sp =>
+        {
+            var settings = sp.GetRequiredService<IOptions<MongoDbSettings>>().Value;
+            var client = sp.GetRequiredService<IMongoClient>();
+            return client.GetDatabase(settings.DatabaseName);
         });
 
         return services;

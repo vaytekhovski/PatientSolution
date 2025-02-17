@@ -5,17 +5,13 @@ using Infrastructure.Persistence;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Infrastructure.Extensions;
+
 public static class DependencyInjection
 {
-    public static IServiceCollection AddRepositories(this IServiceCollection services)
+    public static IServiceCollection AddApplicationLayer(this IServiceCollection services)
     {
         services.AddScoped<IPatientRepository, PatientRepository>();
         services.AddScoped<IPatientChangeLogRepository, PatientChangeLogRepository>();
-        return services;
-    }
-
-    public static IServiceCollection AddApplicationServices(this IServiceCollection services)
-    {
         services.AddScoped<IPatientService, PatientService>();
         return services;
     }

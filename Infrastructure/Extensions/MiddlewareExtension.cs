@@ -1,20 +1,17 @@
-﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.Hosting;
-using Infrastructure.Middlewares;
+﻿using Infrastructure.Middlewares;
+using Microsoft.AspNetCore.Builder;
 
 namespace Infrastructure.Extensions;
 
-public static class MiddlewareExtension
+public static class MiddlewareExtensions
 {
     public static WebApplication ConfigureMiddleware(this WebApplication app)
     {
         app.UseSwagger();
         app.UseSwaggerUI();
-        app.UseAuthorization();
-        app.MapControllers();
         app.UseCors("AllowAll");
         app.UseMiddleware<ExceptionHandlingMiddleware>();
-
+        app.MapControllers();
         return app;
     }
 }
